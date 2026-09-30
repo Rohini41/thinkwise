@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ topic }} | Study Assistant</title>
+<style>
+:root{--bg:#080d1b;--panel:rgba(16,24,45,.93);--soft:rgba(255,255,255,.055);--line:rgba(255,255,255,.1);--text:#f4f7ff;--muted:#98a7bf;--a:#72e7c5;--b:#8ca9ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:22px;display:grid;place-items:center;color:var(--text);font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 8% 8%,rgba(114,231,197,.14),transparent 30%),radial-gradient(circle at 92% 92%,rgba(140,169,255,.15),transparent 32%),var(--bg)}
+.app{width:min(1080px,100%);height:min(800px,94vh);min-height:600px;display:grid;grid-template-columns:255px 1fr;overflow:hidden;border:1px solid var(--line);border-radius:28px;background:var(--panel);box-shadow:0 30px 90px rgba(0,0,0,.4);backdrop-filter:blur(22px)}
+aside{padding:28px 21px;border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.035),transparent)}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:32px}.logo{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;color:#061a15;background:linear-gradient(135deg,var(--a),var(--b));font-size:20px;font-weight:900}.brand strong{display:block;font-size:15px}.brand small{color:var(--muted);font-size:10px}
+.card{padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--soft)}.label{color:var(--muted);font-size:10px;letter-spacing:1.4px;text-transform:uppercase}.topic{margin-top:8px;font-size:18px;font-weight:750}.note{color:var(--muted);font-size:12px;line-height:1.75;margin-top:22px}
+main{min-width:0;display:grid;grid-template-rows:auto 1fr auto}header{padding:20px 25px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}.header-title{font-size:15px;font-weight:750}.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px}.dot{width:8px;height:8px;border-radius:50%;background:var(--a);box-shadow:0 0 14px var(--a)}
+#chat{overflow-y:auto;padding:28px;scroll-behavior:smooth}.welcome{max-width:650px;margin:12vh auto 0;text-align:center}.welcome-icon{width:68px;height:68px;margin:0 auto 18px;display:grid;place-items:center;border:1px solid var(--line);border-radius:22px;background:var(--soft);font-size:28px}.welcome h1{margin:0 0 10px;font-size:clamp(26px,4vw,38px)}.welcome p{margin:0;color:var(--muted);line-height:1.7}
+.message{max-width:800px;margin:0 auto 18px;display:flex}.message.user{justify-content:flex-end}.bubble{max-width:78%;padding:13px 16px;border:1px solid var(--line);border-radius:18px 18px 18px 5px;background:var(--soft);line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.user .bubble{border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,rgba(114,231,197,.18),rgba(140,169,255,.17))}
+.composer{padding:16px 22px 22px;border-top:1px solid var(--line)}.typing{max-width:800px;min-height:18px;margin:0 auto 8px;color:var(--muted);font-size:11px}form{max-width:800px;margin:auto;display:flex;gap:10px;align-items:flex-end;padding:8px;border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.15)}
+textarea{flex:1;min-height:46px;max-height:130px;padding:12px 10px;resize:none;outline:0;border:0;color:var(--text);background:transparent;font:inherit}textarea::placeholder{color:#71849d}button{width:46px;height:46px;flex:0 0 46px;border:0;border-radius:14px;cursor:pointer;color:#041a15;background:linear-gradient(135deg,var(--a),var(--b));font-size:18px;transition:.18s}button:hover{transform:translateY(-2px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+@media(max-width:760px){body{padding:0}.app{width:100%;height:100vh;min-height:100vh;border-radius:0;grid-template-columns:1fr}aside{display:none}header{padding:18px}#chat{padding:20px 15px}.bubble{max-width:88%}}
+</style>
+</head>
+<body>
+<section class="app">
+<aside>
+<div class="brand"><div class="logo">✦</div><div><strong>ThinkWise AI</strong><small>Focused study assistant</small></div></div>
+<div class="card"><div class="label">Active assistant</div><div class="topic">{{ topic }}</div></div>
+<p class="note">Ask academic questions, understand concepts, create revision notes, practice problems, and prepare for examinations.</p>
+</aside>
+<main>
+<header><div class="header-title">{{ topic }}</div><div class="status"><span class="dot"></span> AI Online</div></header>
+<div id="chat">
+<div class="welcome" id="welcome"><div class="welcome-icon">✦</div><h1>Think smarter. Learn better.</h1><p>Ask a study-related question and get a clear, focused explanation from your AI study assistant.</p></div>
+</div>
+<div class="composer"><div class="typing" id="typing"></div><form id="chatForm"><textarea id="message" rows="1" placeholder="Ask a study question..." autocomplete="off"></textarea><button id="sendButton" type="submit" aria-label="Send">➜</button></form></div>
+</main>
+</section>
+<script>
+const chat=document.getElementById("chat"),form=document.getElementById("chatForm"),input=document.getElementById("message"),button=document.getElementById("sendButton"),typing=document.getElementById("typing"),welcome=document.getElementById("welcome");
+function addMessage(text,role){if(welcome)welcome.remove();const w=document.createElement("div");w.className=`message ${role}`;const b=document.createElement("div");b.className="bubble";b.textContent=text;w.appendChild(b);chat.appendChild(w);chat.scrollTop=chat.scrollHeight}
+input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,130)+"px"});
+input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+form.addEventListener("submit",async e=>{e.preventDefault();const message=input.value.trim();if(!message||button.disabled)return;addMessage(message,"user");input.value="";input.style.height="auto";button.disabled=true;typing.textContent="ThinkWise AI is thinking...";
+try{const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Something went wrong.");addMessage(d.answer,"bot")}catch(err){addMessage(err.message||"Unable to connect to the AI.","bot")}finally{typing.textContent="";button.disabled=false;input.focus()}});
+</script>
+</body>
+</html>
